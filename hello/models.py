@@ -16,6 +16,9 @@ class Subject(models.Model):
         (10, "Phase 5 - Testing")
     ))
 
+class SymbolSet(models.Model):
+    name = models.CharField(max_length=50)
+
 class ResponseBlock(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.SET_NULL, null=True)
     phase = models.SmallIntegerField(choices=(
@@ -43,6 +46,3 @@ class Response(models.Model):
     responses = models.CharField(max_length = 5)
     correct_response = models.SmallIntegerField()
     given_response = models.SmallIntegerField()
-
-class SymbolSet(models.Model):
-    name = models.CharField(max_length=50)
