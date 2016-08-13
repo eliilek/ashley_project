@@ -1,9 +1,26 @@
 <!DOCTYPE html>
 <html>
   <head>
-
+    <link rel="stylesheet" type="text/css" href="style.css" />
   </head>
   <body>
-    
+    <div class="background">
+      <div id="stimulus">
+        <img src="{{ stimulus }}"/>
+      </div>
+      <div id="modifier">
+        {{ modifier }}
+      </div>
+
+      <div class="option" id="left_option">
+        <img src="{{ left_image }}"/>
+      </div>
+      <div class="option" id="center_option">
+        <img src="{{ center_image }}"/>
+      </div>
+      <div class="option" id="right_option">
+        <img src="{{ right_image }}"/>
+      </div>
+    </div>
   </body>
 </html>

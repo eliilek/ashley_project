@@ -45,5 +45,4 @@ class Response(models.Model):
     given_response = models.SmallIntegerField()
 
 class SymbolSet(models.Model):
-    name = models.CharField(max_length=30)
-    
+    name = models.CharField(max_length=50)
