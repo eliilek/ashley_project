@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+  </head>
+  <body>
+    <p>
+      Subject: {{ response_block.subject.name }}<br>
+      Taken on: {{ response_block.date_time }}<br><br>
+      Symbol Set: {{ response_block.symbol_set.name }}<br>
+      Phase: {{ response_block.phase }} - {% if response_block.training %}Training{% else %}Testing{% endif %}
+    </p>
+  </body>
+</html>

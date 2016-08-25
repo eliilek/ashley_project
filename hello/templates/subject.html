@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+  </head>
+  <body>
+    <p>
+      Name: {{ subject.name }}<br>
+      Current Phase: {{ subject.phase }} - {% if subject.training %}Training{% else %}Testing{% endif %}
+    </p>
+    <br>
+    {% if response_list %}
+      <table>
+        <tr>
+          <th colspan="3">Previous Responses</th>
+        </tr>
+        {% for response_set in response_list %}
+          <tr>
+            <td>{{ response_set.phase }} - {% if subject.training %}Training{% else %}Testing{% endif %}</td>
+            <td>Recorded {{ response_set.date_time }}</td>
+            <td><a href="{% url 'response_set' response_set.id %}">View Results</a></td>
+          </tr>
+        {% endfor %}
+      </table>
+      <br>
+    {% endif %}
+    <form action="{% url 'edit_subject' subject.id %}" method="post">
+      {% csrf_token %}
+      <input type="submit" value="Edit Subject" />
+    </form><br><br>
+    {% if admin %}
+    <form action="{% url 'trial' %}">
+      <input type="submit" value="Begin Trial" />
+      <input type="hidden" name="subject" value="{{ subject }}" />
+    </form>
+    {% endif %}
+  </body>
+</html>
