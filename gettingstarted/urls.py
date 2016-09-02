@@ -13,6 +13,6 @@ urlpatterns = [
     url(r'^subject/(?P<subid>[0-9]+)/edit', hello.views.edit_subject, name='edit_subject'),
     url(r'^response_set/(?P<responseid>[0-9]+)', hello.views.response_set, name='response_set'),
     url(r'^trial', hello.views.trial, name='trial'),
-    url(r'^myself', hello.views.myself, name='myself')
+    url(r'^myself', hello.views.myself, name='myself'),
     url(r'^report_results', hello.views.report_results, name='report_results')
 ]
