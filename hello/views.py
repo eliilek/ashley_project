@@ -97,6 +97,24 @@ def trial(request):
 
     return render(request, 'trial.html', {'trial': mark_safe(json.dumps(trial)), 'feedback': training})
 
+def report_results(request):
+    if request.method != "POST" or 'responses' not in request.POST.keys():
+        return HttpResponse("You have reached this page in error. If you want to begin a trial, return to the subject view page.")
+    block = ""
+    for response in request.POST['responses']:
+        try:
+            db_response = Response.objects.get(id=response.response_id)
+            db_response.response_time = response.response_time
+            db_response.given_response = response.given_response
+            db_response.save()
+            if not block:
+                block = db_response.block
+                block.complete = True
+                block.save()
+        except:
+            pass
+    return redirect(block)
+
 class SingleSetUnpacker(object):
     def __init__(self, single_set):
         self.symbol_set = single_set.symbol_set.name

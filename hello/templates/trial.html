@@ -1,8 +1,10 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" type="text/css" href="static/style.css" />
-    <script type="text/javascript" src="static/script.js"></script>
+    {% load static %}
+
+    <link rel="stylesheet" type="text/css" href="{% static '/hello/style.css' %}" />
+    <script type="text/javascript" src="{% static '/hello/script.js' %}"></script>
   </head>
   <body>
     <div class="background">

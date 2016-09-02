@@ -1,0 +1,24 @@
+[
+  {
+    "model": "hello.SymbolSet",
+    "pk": 1,
+    "fields": {
+      "name": "droid",
+      "length": 5,
+      "phase": 1,
+      "block_size": 16
+    }
+  },
+  {
+    "model": "hello.SingleSet",
+    "pk": 1,
+    "fields": {
+      "symbol_set": 1,
+      "stimulus": "a",
+      "modifier": true,
+      "options": "b,c,k",
+      "training": true,
+      "correct_response": "b"
+    }
+  }
+]
