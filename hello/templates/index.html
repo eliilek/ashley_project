@@ -1,16 +1,27 @@
 <!DOCTYPE html>
 <html>
   <head>
-
+    <script>
+      function clicked(e){
+        var temp_arr = {{ used_ids }};
+        if({{ used_ids }}.indexOf(parseInt(document.getElementById('subid').value)) == -1){
+          if(!confirm('This will create a new user. Are you sure you want to proceed?')){
+            e.preventDefault();
+          }
+        }
+      }
+    </script>
   </head>
   <body>
     <form action="{% url 'session' %}" method="post">
       {% csrf_token %}
-      First Name:<br>
-      <input type="text" name="firstname"><br>
-      Last Name:<br>
-      <input type="text" name="lastname"><br>
-      <input type="submit" value="Submit">
+      Subject ID:<br>
+      {% if used_ids %}
+      <input type="number" name="subid" id="subid" value={{ used_ids.0|add:1 }} /><br>
+      {% else %}
+      <input type="number" name="subid" id="subid" value=0 /><br>
+      {% endif %}
+      <input type="submit" value="Submit" onclick="clicked(event)">
     </form>
   </body>
 </html>

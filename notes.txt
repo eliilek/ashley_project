@@ -1,0 +1,35 @@
+TODO:
+	Create db model for phase
+		Includes passing criteria: Accuracy_percentage and maximum_duration, both nullable
+		
+
+
+Next steps:
+	Add ready alert to beginning of trial - Done
+	After ajax call, display completion message, button that links to subject/myself - Done
+	Populate seed.json with remainder of trials
+	Find larger images
+____________________
+
+Login with IDs - Done
+	Only IDs stored on site - Done
+	Default to next available, pull last().id + 1 - Done
+Trial display data
+	Responses per minute using existing response times - Done
+	Aggregate correct responses - Done
+	Passing criteria
+User phase view
+	Trials completed per phase
+	Criterion per phase
+	Total duration
+Store session duration, new model foreignkey subject? - Done
+Trial page
+	Directions physically printed
+	Just ready button on page, probably alert()
+	Add boolean flag to model, first trial for user always loads Phase 0, doesn't collect data
+Post-trial feedback
+	Figure something out
+Admin view:
+	Set aside ID for Ashley
+	Displays list of subjects, links, etc
+	Disables trial button

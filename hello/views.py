@@ -7,25 +7,40 @@ import os
 from models import *
 import random
 import copy
+from django.forms.models import model_to_dict
+from datetime import timedelta
 
 # Create your views here.
 def index(request):
-    return render(request, 'index.html')
+    used_ids = list(Subject.objects.all().values_list('pk', flat=True).order_by('-pk'))
+    if len(used_ids) != 0:
+        return render(request, 'index.html', {"used_ids": used_ids})
+    else:
+        return render(request, 'index.html')
 
 def session(request):
     if request.method == "POST":
-        request.session['user'] = request.POST['firstname'].upper() + " " + request.POST['lastname'].upper()
-        request.session['admin'] = False
         try:
-            existing_user = Subject.objects.get(name=request.session['user'])
-            return redirect(existing_user)
+            existing_user = Subject.objects.get(pk=request.POST['subid'])
+            request.session['user'] = request.POST['subid']
+            new_session_length = SessionLength(subject=existing_user, trials=0)
+            new_session_length.save()
+            request.session['session_length'] = new_session_length.pk
+            return redirect('myself')
         except:
-            new_user = Subject(name=request.session['user'], phase=1, training=True)
+            new_user = Subject(subject_id=request.POST['subid'], phase=0, training=True)
             new_user.save()
-            return redirect(new_user)
+            request.session['user'] = request.POST['subid']
+            new_session_length = SessionLength(subject=new_user, trials=0)
+            new_session_length.save()
+            request.session['session_length'] = new_session_length.pk
+            return redirect('myself')
     else:
         if 'user' in request.session:
-            return HttpResponse(request.session['user'].title())
+            try:
+                return redirect(Subject.objects.get(pk=request.session['user']))
+            except:
+                pass
         return HttpResponse("Failure!")
 
 def subject(request, subid):
@@ -41,21 +56,21 @@ def subject(request, subid):
 
 def response_set(request, responseid):
     try:
-        response_block = ResponseBlock.objects.get(responseid)
+        response_block = ResponseBlock.objects.get(id=responseid)
     except:
         return HttpResponse("Oops! This page is looking for a response set that hasn't been recorded.")
-
-    return render(request, 'response_set.html', {'response_block': response_block})
+    responses = Response.objects.filter(block=response_block)
+    return render(request, 'response_set.html', {'response_block': response_block, 'responses': responses})
 
 def myself(request):
     if not 'user' in request.session:
-        return HttpResponse("Oops! You haven't told us your name!<br>Please return to the landing page and enter a name.")
+        return HttpResponse("Please return to the landing page and enter a subject ID.")
     try:
-        sub = Subject.objects.get(name=request.session['user'])
+        sub = Subject.objects.get(pk=request.session['user'])
     except:
         return HttpResponse("Oops! This page is looking for a subject that we don't have any info for.<br>Please return to the landing page and enter a name.")
 
-    response_list = ResponseBlock.objects.filter(subject_id=sub.id)
+    response_list = ResponseBlock.objects.filter(pk=sub.subject_id)
 
     return render(request, 'subject.html', {'subject': sub, 'response_list': response_list, 'admin': False})
 
@@ -66,7 +81,7 @@ def trial(request):
         sub = request.session['user']
     else:
         return HttpResponse("I couldn't identify the user you're trying to start a trial for.")
-    subject = Subject.objects.get(name=sub)
+    subject = Subject.objects.get(pk=sub)
     try:
         symbol_set = random.choice(SymbolSet.objects.filter(phase=subject.phase))
     except:
@@ -79,50 +94,80 @@ def trial(request):
     trial = []
     for i in range(symbol_set.block_size / len(single_sets)):
         for current_set in single_sets:
-            temp = SingleSetUnpacker(current_set)
+            #temp = SingleSetUnpacker(current_set)
+            temp = current_set
+
             options_list = temp.options.split(",")
             random.shuffle(options_list)
-            temp.left_option = temp.symbol_set + "_" + options_list[0]
-            temp.center_option = temp.symbol_set + "_" + options_list[1]
-            temp.right_option = temp.symbol_set + "_" + options_list[2]
-            temp.options = (",".join(options_list))
-            trial.append(temp)
+            temp_dict = model_to_dict(temp)
+            temp_dict["symbol_set"] = temp.symbol_set.name
+            temp_dict["left"] = options_list[0]
+            temp_dict["center"] = options_list[1]
+            temp_dict["right"] = options_list[2]
+            trial.append(temp_dict)
     random.shuffle(trial)
     new_block = ResponseBlock(subject=subject, phase=subject.phase, training=training, symbol_set=symbol_set, complete=False)
     new_block.save()
-    for i in len(trial):
-        new_response = Response(block=new_block, modifier=trial[i].modifier, stimulus=trial[i].stimulus, options=trial[i].options, correct_response=trial[i].correct_response)
-        trial[i].response_id = new_response.id
+    for i in range(len(trial)):
+        new_response = Response(block=new_block, modifier=trial[i]["modifier"], stimulus=trial[i]["stimulus"], options=trial[i]["options"], correct_response=trial[i]["correct_response"])
         new_response.save()
+        trial[i]["response_id"] = new_response.id
+
+    session_length = SessionLength.objects.get(pk=request.session['session_length'])
+    session_length.trials += 1
+    session_length.save()
 
     return render(request, 'trial.html', {'trial': mark_safe(json.dumps(trial)), 'feedback': training})
 
 def report_results(request):
-    if request.method != "POST" or 'responses' not in request.POST.keys():
+    if request.method != "POST":
         return HttpResponse("You have reached this page in error. If you want to begin a trial, return to the subject view page.")
     block = ""
-    for response in request.POST['responses']:
+    json_object = json.loads(request.body)
+    if len(json_object) < int(json_object['trial_length']) + 1:
         try:
-            db_response = Response.objects.get(id=response.response_id)
-            db_response.response_time = response.response_time
-            db_response.given_response = response.given_response
+            db_response = Response.objects.get(id=json_object[0].response_id)
+            block = db_response.block
+            block.delete()
+        except:
+            print "Delete failed"
+        return redirect("/myself")
+    for response in json_object:
+        try:
+            db_response = Response.objects.get(id=json_object[response]['response_id'])
+            db_response.response_time = timedelta(milliseconds=json_object[response]['response_time'])
+            db_response.given_response = json_object[response]['given_response']
             db_response.save()
-            if not block:
+            if block == "":
                 block = db_response.block
                 block.complete = True
                 block.save()
         except:
             pass
-    return redirect(block)
-
-class SingleSetUnpacker(object):
-    def __init__(self, single_set):
-        self.symbol_set = single_set.symbol_set.name
-        self.stimulus = self.symbol_set + "_" + single_set.stimulus
-        self.modifier = single_set.get_modifier_display()
-        self.options = single_set.options
-        self.training = single_set.training
-        self.correct_response = single_set.correct_response
+    try:
+        return redirect(block)
+    except:
+        return redirect("/myself")
 
 def edit_subject(request, subid):
-    return HttpResponse("Pass")
+    try:
+        sub = Subject.objects.get(pk=subid)
+        return render(request, 'subject_edit.html', {'subject': sub})
+    except:
+        return HttpResponse("I couldn't find the user you're trying to edit.")
+
+def phase_view(request, subid):
+    try:
+        sub = Subject.objects.get(pk=subid)
+    except:
+        return HttpResponse("I couldn't find the user you're trying to view.")
+
+    response_list = ResponseBlock.objects.filter(pk=sub.subject_id)
+    phases = {}
+    for block in response_list:
+        if not (block.phase in phases.keys()):
+            phases[block.phase] = {}
+        phases[block.phase][block.pk] = block
+
+
+    return render(request, 'phase_view.html')

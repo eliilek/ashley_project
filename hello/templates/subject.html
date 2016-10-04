@@ -24,9 +24,13 @@
       </table>
       <br>
     {% endif %}
-    <form action="{% url 'edit_subject' subject.id %}" method="post">
+    <form action="{% url 'edit_subject' subject.subject_id %}" method="post">
       {% csrf_token %}
       <input type="submit" value="Edit Subject" />
+    </form><br><br>
+    <form action="{% url 'phase_view' subject.subject_id %}" method="post">
+      {% csrf_token %}
+      <input type="submit" value="View Results By Phase" />
     </form><br><br>
     {% if admin %}
     <form action="{% url 'trial' %}">

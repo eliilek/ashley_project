@@ -4,10 +4,152 @@
     {% load static %}
 
     <link rel="stylesheet" type="text/css" href="{% static '/hello/style.css' %}" />
-    <script type="text/javascript" src="{% static '/hello/script.js' %}"></script>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js" type="text/javascript"></script>
+    <script type="text/javascript">
+    var timer_start;
+    var index = 0;
+    var trial = JSON.parse('{{ trial }}');
+    var responses = {};
+    var complete = false;
+    var instructions = "Ashley hasn't given me instructions yet, but press ok to get started!"
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie != '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = jQuery.trim(cookies[i]);
+                // Does this cookie string begin with the name we want?
+                if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    var csrftoken = getCookie('csrftoken');
+
+    function create_img(src){
+      var elem = document.createElement("img");
+      elem.setAttribute("src", "{% static 'hello/' %}" + src);
+      return elem;
+    }
+
+    function post(path, parameters){
+      var xhr = new XMLHttpRequest();
+      xhr.open("POST", path, true);
+      xhr.setRequestHeader('Content-Type', 'application/json; charset=UTF-8');
+      xhr.setRequestHeader('X-CSRFToken', csrftoken);
+      complete = true;
+      xhr.send(JSON.stringify(parameters));
+    }
+
+    function old_post(path, parameters){
+            var form = $("<form>{% csrf_token %}</form>");
+
+            form.attr("method", "post");
+            form.attr("action", path);
+
+            var field = $('<input />');
+            field.attr("type", "hidden");
+            field.attr("name", "length");
+            field.attr("value", trial.length)
+            form.append(field);
+
+            $.each(parameters, function(key, value) {
+                if ( typeof value == 'object' || typeof value == 'array' ){
+                    $.each(value, function(subkey, subvalue) {
+                        var field = $('<input />');
+                        field.attr("type", "hidden");
+                        field.attr("name", key);
+                        field.attr("value", subvalue);
+                        form.append(field);
+                    });
+                } else {
+                    var field = $('<input />');
+                    field.attr("type", "hidden");
+                    field.attr("name", key);
+                    field.attr("value", value);
+                    form.append(field);
+                }
+            });
+            $(document.body).append(form);
+            complete = true;
+            form.submit();
+        }
+
+    function processResponse(response){
+      timer_end = Date.now();
+      responses[index] = {response_id:trial[index]["response_id"], given_response:response, response_time:timer_end-timer_start};
+      if (trial[index].training && trial[index].correct_response == response){
+        alert("That was the correct answer!\nYou answered in " + ((timer_end-timer_start)/1000.0).toFixed(2) + " seconds.");
+      } else if (trial[index].training){
+        alert("Sorry, that answer was incorrect.");
+      }
+
+      $("#stimulus img").last().remove()
+      $("#stimulus").off()
+      $("#left_option img").last().remove()
+      $("#left_option").off()
+      $("#center_option img").last().remove()
+      $("#center_option").off()
+      $("#right_option img").last().remove()
+      $("#right_option").off()
+
+      index++;
+      if (index >= trial.length){
+        responses['trial_length'] = trial.length;
+        post("{% url 'report_results' %}", responses);
+        $("#background").html("Congrats! You're all finished! Pass the tablet back to your [ask Ashley for language].");
+        var form = $(document.createElement('form'));
+        form.attr("method", "GET");
+        form.attr("action", "{% url 'myself' %}");
+        form.append('<input type="submit" value="Results"/>');
+        $("#background").append(form);
+        return 0;
+      }
+      refresh();
+    }
+
+    function refresh(){
+      $("#stimulus").append($('<img>',{src:"{% static 'hello/' %}" + trial[index]["symbol_set"] + "_" + trial[index]["stimulus"] + ".jpg"}));
+      $("#left_option").append($('<img>',{src:"{% static 'hello/' %}" + trial[index]["symbol_set"] + "_" + trial[index]["left"] + ".jpg"}));
+      $("#center_option").append($('<img>',{src:"{% static 'hello/' %}" + trial[index]["symbol_set"] + "_" + trial[index]["center"] + ".jpg"}));
+      $("#right_option").append($('<img>',{src:"{% static 'hello/' %}" + trial[index]["symbol_set"] + "_" + trial[index]["right"] + ".jpg"}));
+      if (trial[index]["modifier"]){
+        $("#modifier").html("!!!!!");
+      } else {
+        $("#modifier").html("?????");
+      }
+      $("#left_option").click(function(){processResponse(trial[index]["left"])});
+      $("#center_option").click(function(){processResponse(trial[index]["center"])});
+      $("#right_option").click(function(){processResponse(trial[index]["right"])});
+
+      timer_start = Date.now();
+    }
+
+    $(document).ready(function(){
+      alert(instructions);
+      refresh();
+    });
+
+    $(window).bind(
+      "beforeunload",
+      function(){
+        if (complete == false){
+          if (responses.length == 0){
+            responses[index] = {response_id: trial[index]["response_id"]}
+          }
+          responses['trial_length'] = trial.length;
+          post("{% url 'report_results' %}", responses);
+        }
+      }
+    )
+    </script>
   </head>
   <body>
-    <div class="background">
+    <div id="background">
       <div id="stimulus">
       </div>
       <div id="modifier">
