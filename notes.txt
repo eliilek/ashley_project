@@ -1,8 +1,22 @@
 TODO:
-	Create db model for phase
-		Includes passing criteria: Accuracy_percentage and maximum_duration, both nullable
-		
+	Create db model for phase - DONE
+		Includes passing criteria: Accuracy_percentage and maximum_duration, both nullable - DONE
+	Phase View view - DONE
+	Phase View html page - DONE
+	Reimplement default admin page - DONE
+		ID for new subject redirects to /admin - DONE
+	Change admin page to display by subject id - DONE
+		Maybe just add __unicode__ to subject? - DONE
+	Implement passing criteria on result displays - DONE
+	Add passing criteria to Trial Display/Subject page - DONE
+	Find larger images
+	Refactor project name
+	Figure out how to store images in db
+	Register Symbol Set/Single Sets in admin page
+		ModelAdmin, requires sorting out
 
+SUPERUSER = ashley
+SUPERUSER PASS = ashleythesis
 
 Next steps:
 	Add ready alert to beginning of trial - Done
@@ -18,10 +32,10 @@ Trial display data
 	Responses per minute using existing response times - Done
 	Aggregate correct responses - Done
 	Passing criteria
-User phase view
-	Trials completed per phase
-	Criterion per phase
-	Total duration
+User phase view - DONE
+	Trials completed per phase - DONE
+	Criterion per phase - DONE
+	Total duration - DONE
 Store session duration, new model foreignkey subject? - Done
 Trial page
 	Directions physically printed

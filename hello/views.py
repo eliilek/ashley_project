@@ -28,13 +28,7 @@ def session(request):
             request.session['session_length'] = new_session_length.pk
             return redirect('myself')
         except:
-            new_user = Subject(subject_id=request.POST['subid'], phase=0, training=True)
-            new_user.save()
-            request.session['user'] = request.POST['subid']
-            new_session_length = SessionLength(subject=new_user, trials=0)
-            new_session_length.save()
-            request.session['session_length'] = new_session_length.pk
-            return redirect('myself')
+            return redirect('/adminhello/subject/add')
     else:
         if 'user' in request.session:
             try:
@@ -70,14 +64,14 @@ def myself(request):
     except:
         return HttpResponse("Oops! This page is looking for a subject that we don't have any info for.<br>Please return to the landing page and enter a name.")
 
-    response_list = ResponseBlock.objects.filter(pk=sub.subject_id)
+    response_list = ResponseBlock.objects.filter(subject=sub)
 
     return render(request, 'subject.html', {'subject': sub, 'response_list': response_list, 'admin': False})
 
 def trial(request):
     if request.method == "POST" and 'subject' in request.POST.keys():
         sub = request.POST['subject']
-    elif 'user' in request.session.keys() and not request.session['admin']:
+    elif 'user' in request.session.keys():
         sub = request.session['user']
     else:
         return HttpResponse("I couldn't identify the user you're trying to start a trial for.")
@@ -86,11 +80,7 @@ def trial(request):
         symbol_set = random.choice(SymbolSet.objects.filter(phase=subject.phase))
     except:
         return HttpResponse("I have no symbol sets for this phase.")
-    if subject.phase % 2 == 0:
-        training = False
-    else:
-        training = True
-    single_sets = SingleSet.objects.filter(symbol_set=symbol_set).filter(training=training)
+    single_sets = SingleSet.objects.filter(symbol_set=symbol_set).filter(training=subject.phase.training)
     trial = []
     for i in range(symbol_set.block_size / len(single_sets)):
         for current_set in single_sets:
@@ -106,7 +96,7 @@ def trial(request):
             temp_dict["right"] = options_list[2]
             trial.append(temp_dict)
     random.shuffle(trial)
-    new_block = ResponseBlock(subject=subject, phase=subject.phase, training=training, symbol_set=symbol_set, complete=False)
+    new_block = ResponseBlock(subject=subject, phase=subject.phase, symbol_set=symbol_set, complete=False)
     new_block.save()
     for i in range(len(trial)):
         new_response = Response(block=new_block, modifier=trial[i]["modifier"], stimulus=trial[i]["stimulus"], options=trial[i]["options"], correct_response=trial[i]["correct_response"])
@@ -117,7 +107,7 @@ def trial(request):
     session_length.trials += 1
     session_length.save()
 
-    return render(request, 'trial.html', {'trial': mark_safe(json.dumps(trial)), 'feedback': training})
+    return render(request, 'trial.html', {'trial': mark_safe(json.dumps(trial)), 'feedback': subject.phase.training})
 
 def report_results(request):
     if request.method != "POST":
@@ -162,12 +152,28 @@ def phase_view(request, subid):
     except:
         return HttpResponse("I couldn't find the user you're trying to view.")
 
-    response_list = ResponseBlock.objects.filter(pk=sub.subject_id)
-    phases = {}
-    for block in response_list:
-        if not (block.phase in phases.keys()):
-            phases[block.phase] = {}
-        phases[block.phase][block.pk] = block
+    response_list = ResponseBlock.objects.filter(subject=sub)
+    phases = Phase.objects.all()
 
+    table_data = {}
+    for phase in phases:
+        temp = response_list.filter(phase=phase)
+        if temp.exists():
+            trial_count = len(temp)
+            trial_cor = 0
+            total_duration = 0
+            for block in temp:
+                responses = block.response_set.all()
+                block_count = len(responses)
+                cor_count = 0.0
+                block_duration = 0
+                for response in responses:
+                    cor_count += response.correct()
+                    total_duration += response.get_response_time()
+                if (not phase.passing_accuracy_percentage) or (cor_count/block_count >= phase.passing_accuracy_percentage):
+                    if (not phase.passing_time) or (block_duration <= phase.get_passing_time()):
+                        trial_cor += 1
+                total_duration += block_duration
+            table_data[str(phase)] = {'count':trial_count, 'passing':trial_cor, 'total_duration':total_duration}
 
-    return render(request, 'phase_view.html')
+    return render(request, 'phase_view.html', {'table_data':table_data, 'subject':sub})

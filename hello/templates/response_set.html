@@ -17,7 +17,7 @@
       response_times_ms /= 60000.0;
       $("#rpm").html((count/response_times_ms).toFixed(2));
       $("#total_correct").html(total_correct);
-      $("#passed").html("Not implemented yet");
+      $("#passed").html("{{ response_block.successful }}");
     });
     </script>
   </head>
@@ -26,7 +26,7 @@
       Subject: {{ response_block.subject.name }}<br>
       Taken on: {{ response_block.date_time }}<br><br>
       Symbol Set: {{ response_block.symbol_set.name }}<br>
-      Phase: {{ response_block.phase }} - {% if response_block.training %}Training{% else %}Testing{% endif %}
+      Phase: {{ response_block.phase }}
     </p>
     {% if responses %}
       <table>
@@ -51,12 +51,12 @@
         <tr>
           <th colspan=2>Responses Per Minute</th>
           <th colspan=2>Total Correct Responses</th>
-          <th colspan=2>Passing Criteria Met</th>
+          <th colspan=2>Passing Criteria</th>
         </tr>
         <tr>
-          <td id="rpm" colspan=2></td>
-          <td id="total_correct" colspan=2></td>
-          <td id="passed" colspan=2></td>
+          <td id="rpm" colspan=2 style="text-align:center"></td>
+          <td id="total_correct" colspan=2 style="text-align:center"></td>
+          <td id="passed" colspan=2 style="text-align:center"></td>
         </tr>
       </table>
     {% endif %}

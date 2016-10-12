@@ -4,6 +4,29 @@
 
   </head>
   <body>
-    
+    <p>
+      Subject: {{subject.subject_id}}<br>
+      Phase View
+    </p><br>
+    {% if table_data %}
+      <table>
+        <tr>
+          <th>Phase</th>
+          <th>Trials Completed</th>
+          <th>Trials Passed</th>
+          <th>Total Time</th>
+        </tr>
+        {% for key, value in table_data.items %}
+          <tr>
+            <td>{{key}}</td>
+            <td>{{value.count}}</td>
+            <td>{{value.passing}}</td>
+            <td>{% widthratio value.total_duration 1000 1 %} Seconds</td>
+          </tr>
+        {% endfor %}
+      </table>
+    {% else %}
+      This subject has no data to display
+    {% endif %}
   </body>
 </html>

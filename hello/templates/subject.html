@@ -5,8 +5,8 @@
   </head>
   <body>
     <p>
-      Name: {{ subject.name }}<br>
-      Current Phase: {{ subject.phase }} - {% if subject.training %}Training{% else %}Testing{% endif %}
+      Subject: {{ subject.subject_id }}<br>
+      Current Phase: {{ subject.phase }}
     </p>
     <br>
     {% if response_list %}
@@ -16,8 +16,9 @@
         </tr>
         {% for response_set in response_list %}
           <tr>
-            <td>{{ response_set.phase }} - {% if subject.training %}Training{% else %}Testing{% endif %}</td>
+            <td>{{ response_set.phase }}</td>
             <td>Recorded {{ response_set.date_time }}</td>
+            <td>{{ response_set.successful }}</td>
             <td><a href="{% url 'response_set' response_set.id %}">View Results</a></td>
           </tr>
         {% endfor %}
@@ -32,7 +33,7 @@
       {% csrf_token %}
       <input type="submit" value="View Results By Phase" />
     </form><br><br>
-    {% if admin %}
+    {% if not admin %}
     <form action="{% url 'trial' %}">
       <input type="submit" value="Begin Trial" />
       <input type="hidden" name="subject" value="{{ subject }}" />

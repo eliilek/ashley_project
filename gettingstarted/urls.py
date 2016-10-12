@@ -1,4 +1,6 @@
 from django.conf.urls import include, url
+from django.contrib import admin
+admin.autodiscover()
 
 import hello.views
 
@@ -15,5 +17,6 @@ urlpatterns = [
     url(r'^trial', hello.views.trial, name='trial'),
     url(r'^myself', hello.views.myself, name='myself'),
     url(r'^report_results', hello.views.report_results, name='report_results'),
-    url(r'^phase/(?P<subid>[0-9]+))/$', hello.views.phase_view, name='phase_view'),
+    url(r'^phase/(?P<subid>[0-9]+)/$', hello.views.phase_view, name='phase_view'),
+    url(r'^admin', include(admin.site.urls), name='admin'),
 ]

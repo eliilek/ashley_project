@@ -16,11 +16,7 @@
     <form action="{% url 'session' %}" method="post">
       {% csrf_token %}
       Subject ID:<br>
-      {% if used_ids %}
-      <input type="number" name="subid" id="subid" value={{ used_ids.0|add:1 }} /><br>
-      {% else %}
-      <input type="number" name="subid" id="subid" value=0 /><br>
-      {% endif %}
+      <input type="number" name="subid" id="subid" /><br>
       <input type="submit" value="Submit" onclick="clicked(event)">
     </form>
   </body>

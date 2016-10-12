@@ -2,19 +2,32 @@ from django.db import models
 from django.urls import reverse
 from django.utils import timezone
 
-# Create your models here.
+class Phase(models.Model):
+    phase_num = models.SmallIntegerField(verbose_name="Phase Number")
+    training = models.BooleanField(default=True)
+    passing_accuracy_percentage = models.SmallIntegerField(null=True, blank=True, verbose_name="Passing Accuracy %")
+    passing_time = models.DurationField(null=True, blank=True, verbose_name="Passing Time (ms)")
+
+    def __unicode__(self):
+        return "Phase " + str(self.phase_num) + " - " + ("Training" if self.training else "Testing")
+
+    def get_passing_time(self):
+        return self.response_time.microseconds/1000.0
+
 class Subject(models.Model):
     subject_id = models.SmallIntegerField(primary_key=True)
-    phase = models.SmallIntegerField()
-    training = models.BooleanField()
+    phase = models.ForeignKey(Phase, on_delete=models.SET_NULL, null=True)
 
     def get_absolute_url(self):
         return reverse("subject", args=[str(self.id)])
 
+    def __unicode__(self):
+        return "Subject " + str(self.subject_id)
+
 class SymbolSet(models.Model):
     name = models.CharField(max_length=50)
     length = models.SmallIntegerField()
-    phase = models.SmallIntegerField()
+    phase = models.ForeignKey(Phase, on_delete=models.SET_NULL, null=True)
     block_size = models.SmallIntegerField()
 
 class SingleSet(models.Model):
@@ -27,8 +40,7 @@ class SingleSet(models.Model):
 
 class ResponseBlock(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.SET_NULL, null=True)
-    phase = models.SmallIntegerField()
-    training = models.BooleanField()
+    phase = models.ForeignKey(Phase, on_delete=models.SET_NULL, null=True)
     symbol_set = models.ForeignKey(SymbolSet, on_delete=models.CASCADE)
     complete = models.BooleanField(default=False)
     created = models.DateTimeField(editable=False)
@@ -44,6 +56,20 @@ class ResponseBlock(models.Model):
     def get_absolute_url(self):
         return reverse("response_set", args=[str(self.id)])
 
+    def successful(self):
+        responses = self.response_set.all()
+        time = 0
+        correct = 0
+        count = 0
+        for response in responses:
+            time += response.get_response_time()
+            count += 1
+            correct += response.correct()
+        if (not self.phase.passing_accuracy_percentage) or (correct/count >= self.phase.passing_accuracy_percentage/100):
+            if (not self.phase.passing_time) or (time <= self.phase.passing_time):
+                return "Passed"
+        return "Failed"
+
 class Response(models.Model):
     block = models.ForeignKey(ResponseBlock, on_delete=models.CASCADE)
     response_time = models.DurationField(null=True)
@@ -54,7 +80,10 @@ class Response(models.Model):
     given_response = models.CharField(max_length=1, null=True)
 
     def get_response_time(self):
-        return self.response_time.microseconds/1000.0
+        try:
+            return self.response_time.microseconds/1000.0
+        except:
+            return 0
 
     def correct(self):
         if self.correct_response == self.given_response:
