@@ -30,12 +30,6 @@
     }
     var csrftoken = getCookie('csrftoken');
 
-    function create_img(src){
-      var elem = document.createElement("img");
-      elem.setAttribute("src", "{% static 'hello/' %}" + src);
-      return elem;
-    }
-
     function post(path, parameters){
       var xhr = new XMLHttpRequest();
       xhr.open("POST", path, true);
@@ -44,40 +38,6 @@
       complete = true;
       xhr.send(JSON.stringify(parameters));
     }
-
-    function old_post(path, parameters){
-            var form = $("<form>{% csrf_token %}</form>");
-
-            form.attr("method", "post");
-            form.attr("action", path);
-
-            var field = $('<input />');
-            field.attr("type", "hidden");
-            field.attr("name", "length");
-            field.attr("value", trial.length)
-            form.append(field);
-
-            $.each(parameters, function(key, value) {
-                if ( typeof value == 'object' || typeof value == 'array' ){
-                    $.each(value, function(subkey, subvalue) {
-                        var field = $('<input />');
-                        field.attr("type", "hidden");
-                        field.attr("name", key);
-                        field.attr("value", subvalue);
-                        form.append(field);
-                    });
-                } else {
-                    var field = $('<input />');
-                    field.attr("type", "hidden");
-                    field.attr("name", key);
-                    field.attr("value", value);
-                    form.append(field);
-                }
-            });
-            $(document.body).append(form);
-            complete = true;
-            form.submit();
-        }
 
     function processResponse(response){
       timer_end = Date.now();
@@ -113,10 +73,10 @@
     }
 
     function refresh(){
-      $("#stimulus").append($('<img>',{src:"{% static 'hello/' %}" + trial[index]["symbol_set"] + "_" + trial[index]["stimulus"] + ".jpg"}));
-      $("#left_option").append($('<img>',{src:"{% static 'hello/' %}" + trial[index]["symbol_set"] + "_" + trial[index]["left"] + ".jpg"}));
-      $("#center_option").append($('<img>',{src:"{% static 'hello/' %}" + trial[index]["symbol_set"] + "_" + trial[index]["center"] + ".jpg"}));
-      $("#right_option").append($('<img>',{src:"{% static 'hello/' %}" + trial[index]["symbol_set"] + "_" + trial[index]["right"] + ".jpg"}));
+      $("#stimulus").append($('<img>',{src:trial[index]["stimulus"]}));
+      //$("#left_option").append($('<img>',{src:"{% static 'hello/' %}" + trial[index]["symbol_set"] + "_" + trial[index]["left"] + ".jpg"}));
+      //$("#center_option").append($('<img>',{src:"{% static 'hello/' %}" + trial[index]["symbol_set"] + "_" + trial[index]["center"] + ".jpg"}));
+      //$("#right_option").append($('<img>',{src:"{% static 'hello/' %}" + trial[index]["symbol_set"] + "_" + trial[index]["right"] + ".jpg"}));
       if (trial[index]["modifier"]){
         $("#modifier").html("!!!!!");
       } else {

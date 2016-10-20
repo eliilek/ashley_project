@@ -4,12 +4,11 @@ from django.utils import timezone
 
 class Phase(models.Model):
     phase_num = models.SmallIntegerField(verbose_name="Phase Number")
-    training = models.BooleanField(default=True)
     passing_accuracy_percentage = models.SmallIntegerField(null=True, blank=True, verbose_name="Passing Accuracy %")
     passing_time = models.DurationField(null=True, blank=True, verbose_name="Passing Time (ms)")
 
     def __unicode__(self):
-        return "Phase " + str(self.phase_num) + " - " + ("Training" if self.training else "Testing")
+        return "Phase " + str(self.phase_num)
 
     def get_passing_time(self):
         return self.response_time.microseconds/1000.0
@@ -17,6 +16,7 @@ class Phase(models.Model):
 class Subject(models.Model):
     subject_id = models.SmallIntegerField(primary_key=True)
     phase = models.ForeignKey(Phase, on_delete=models.SET_NULL, null=True)
+    training = models.BooleanField(default=True)
 
     def get_absolute_url(self):
         return reverse("subject", args=[str(self.id)])
@@ -25,18 +25,37 @@ class Subject(models.Model):
         return "Subject " + str(self.subject_id)
 
 class SymbolSet(models.Model):
-    name = models.CharField(max_length=50)
-    length = models.SmallIntegerField()
+    class Meta:
+        verbose_name = "Symbol Set"
+    name = models.CharField(max_length=100)
     phase = models.ForeignKey(Phase, on_delete=models.SET_NULL, null=True)
     block_size = models.SmallIntegerField()
 
-class SingleSet(models.Model):
+    def __unicode__(self):
+        return self.name + " Set"
+
+class Symbol(models.Model):
+    name = models.CharField(max_length=50)
     symbol_set = models.ForeignKey(SymbolSet, on_delete=models.CASCADE)
-    stimulus = models.CharField(max_length=1)
-    modifier = models.BooleanField()
-    options = models.CharField(max_length=5)
+    image = models.ImageField(upload_to="symbols")
+
+    def __unicode__(self):
+        return self.name
+
+class SingleSet(models.Model):
+    class Meta:
+        verbose_name = "Single Set"
+    symbol_set = models.ForeignKey(SymbolSet, on_delete=models.CASCADE)
+    stimulus = models.ForeignKey(Symbol, on_delete=models.CASCADE)
+    modifier = models.BooleanField(verbose_name="!!!!!")
+    option_1 = models.ForeignKey(Symbol, on_delete=models.CASCADE, related_name="first")
+    option_2 = models.ForeignKey(Symbol, on_delete=models.CASCADE, related_name="second")
+    option_3 = models.ForeignKey(Symbol, on_delete=models.CASCADE, related_name="third")
     training = models.BooleanField()
-    correct_response = models.CharField(max_length=1)
+    correct_response = models.CharField(max_length=1, verbose_name="Option Number of Correct Response (1, 2, or 3)")
+
+    def __unicode__(self):
+        return str(self.symbol_set) + " - " + str(self.stimulus) + " " + ("!!!!!" if self.modifier else "?????")
 
 class ResponseBlock(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.SET_NULL, null=True)
@@ -73,11 +92,13 @@ class ResponseBlock(models.Model):
 class Response(models.Model):
     block = models.ForeignKey(ResponseBlock, on_delete=models.CASCADE)
     response_time = models.DurationField(null=True)
-    modifier = models.BooleanField()
-    stimulus = models.CharField(max_length=1)
-    options = models.CharField(max_length=5)
-    correct_response = models.CharField(max_length=1)
-    given_response = models.CharField(max_length=1, null=True)
+    modifier = models.BooleanField(verbose_name="!!!!!")
+    stimulus = models.ForeignKey(Symbol, on_delete=models.CASCADE)
+    option_1 = models.ForeignKey(Symbol, on_delete=models.CASCADE, related_name="first_response")
+    option_2 = models.ForeignKey(Symbol, on_delete=models.CASCADE, related_name="second_response")
+    option_3 = models.ForeignKey(Symbol, on_delete=models.CASCADE, related_name="third_response")
+    correct_response = models.PositiveSmallIntegerField()
+    given_response = models.PositiveSmallIntegerField(null=True)
 
     def get_response_time(self):
         try:

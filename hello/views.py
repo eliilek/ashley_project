@@ -80,34 +80,43 @@ def trial(request):
         symbol_set = random.choice(SymbolSet.objects.filter(phase=subject.phase))
     except:
         return HttpResponse("I have no symbol sets for this phase.")
-    single_sets = SingleSet.objects.filter(symbol_set=symbol_set).filter(training=subject.phase.training)
+    single_sets = SingleSet.objects.filter(symbol_set=symbol_set).filter(training=subject.training)
     trial = []
     for i in range(symbol_set.block_size / len(single_sets)):
         for current_set in single_sets:
-            #temp = SingleSetUnpacker(current_set)
-            temp = current_set
-
-            options_list = temp.options.split(",")
+            options_list = []
+            options_list.append(current_set.option_1)
+            options_list.append(current_set.option_2)
+            options_list.append(current_set.option_3)
             random.shuffle(options_list)
-            temp_dict = model_to_dict(temp)
-            temp_dict["symbol_set"] = temp.symbol_set.name
-            temp_dict["left"] = options_list[0]
-            temp_dict["center"] = options_list[1]
-            temp_dict["right"] = options_list[2]
+
+            temp_dict = model_to_dict(current_set)
+            temp_dict["symbol_set"] = current_set.symbol_set.name
+            temp_dict["left"] = model_to_dict(options_list[0])
+            temp_dict["left"]["image"] = temp_dict["left"]["image"].url
+            temp_dict["center"] = model_to_dict(options_list[1])
+            temp_dict["center"]["image"] = temp_dict["center"]["image"].url
+            temp_dict["right"] = model_to_dict(options_list[2])
+            temp_dict["right"]["image"] = temp_dict["right"]["image"].url
             trial.append(temp_dict)
     random.shuffle(trial)
     new_block = ResponseBlock(subject=subject, phase=subject.phase, symbol_set=symbol_set, complete=False)
     new_block.save()
     for i in range(len(trial)):
-        new_response = Response(block=new_block, modifier=trial[i]["modifier"], stimulus=trial[i]["stimulus"], options=trial[i]["options"], correct_response=trial[i]["correct_response"])
+        stimulus = Symbol.objects.get(pk=trial[i]["stimulus"])
+        trial[i]["stimulus"] = Symbol.objects.get(pk=trial[i]["stimulus"]).image.url
+        option_1 = Symbol.objects.get(pk=trial[i]["option_1"])
+        option_2 = Symbol.objects.get(pk=trial[i]["option_2"])
+        option_3 = Symbol.objects.get(pk=trial[i]["option_3"])
+        new_response = Response(block=new_block, modifier=trial[i]["modifier"], stimulus=stimulus, option_1=option_1, option_2=option_2, option_3=option_3, correct_response=trial[i]["correct_response"])
         new_response.save()
-        trial[i]["response_id"] = new_response.id
+        trial[i]["response_id"] = new_response.pk
 
     session_length = SessionLength.objects.get(pk=request.session['session_length'])
     session_length.trials += 1
     session_length.save()
 
-    return render(request, 'trial.html', {'trial': mark_safe(json.dumps(trial)), 'feedback': subject.phase.training})
+    return render(request, 'trial.html', {'trial': mark_safe(json.dumps(trial)), 'feedback': subject.training})
 
 def report_results(request):
     if request.method != "POST":

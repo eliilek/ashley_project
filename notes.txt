@@ -9,9 +9,12 @@ TODO:
 		Maybe just add __unicode__ to subject? - DONE
 	Implement passing criteria on result displays - DONE
 	Add passing criteria to Trial Display/Subject page - DONE
-	Find larger images
-	Refactor project name
+	Check larger images - DONE (they are good)
 	Figure out how to store images in db
+		Create new model for images, ForeignKey to a symbol set, give single set ForeignKey to an image - DONE
+		Redo trial view, string slicing no longer needed
+		Redo report_results
+		SymbolSet no longer has Length, substitute with length of image_set
 	Register Symbol Set/Single Sets in admin page
 		ModelAdmin, requires sorting out
 
