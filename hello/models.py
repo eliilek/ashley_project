@@ -37,7 +37,7 @@ class SymbolSet(models.Model):
 class Symbol(models.Model):
     name = models.CharField(max_length=50)
     symbol_set = models.ForeignKey(SymbolSet, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to="symbols")
+    image = models.ImageField(upload_to="hello/static/hello")
 
     def __unicode__(self):
         return self.name
