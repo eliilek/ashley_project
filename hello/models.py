@@ -37,10 +37,13 @@ class SymbolSet(models.Model):
 class Symbol(models.Model):
     name = models.CharField(max_length=50)
     symbol_set = models.ForeignKey(SymbolSet, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to="hello/static/hello")
+    image = models.ImageField(upload_to="hello/static/hello/symbols")
 
     def __unicode__(self):
         return self.name
+
+    def get_path(self):
+        return self.url[6:]
 
 class SingleSet(models.Model):
     class Meta:

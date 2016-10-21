@@ -13,7 +13,8 @@ TODO:
 	Figure out how to store images in db - DONE
 		Create new model for images, ForeignKey to a symbol set, give single set ForeignKey to an image - DONE
 		Redo trial view, string slicing no longer needed - DONE
-		****Use heroku tutorial, set up AWS bucket, upload images****
+		Set upload_to to put images in static folder - DONE
+		
 		Redo report_results
 		SymbolSet no longer has Length, substitute with length of image_set
 	Register Symbol Set/Single Sets in admin page
