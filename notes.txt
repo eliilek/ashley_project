@@ -1,3 +1,15 @@
+Meeting Notes 10/21:
+	New formatting for displaying results
+	Desired size of images on trial page
+	Go over admin view, anything else she might need/want to remove
+
+Remove edit subject button, all from admin
+Change block size to times per arrangement or something
+Add Score to session data, display points in feedback
+	Display cast to int, store fractional
+	In report results, if over 15 do something, reset to 0
+	Flag in subject, gets_points
+
 TODO:
 	Create db model for phase - DONE
 		Includes passing criteria: Accuracy_percentage and maximum_duration, both nullable - DONE
@@ -14,41 +26,9 @@ TODO:
 		Create new model for images, ForeignKey to a symbol set, give single set ForeignKey to an image - DONE
 		Redo trial view, string slicing no longer needed - DONE
 		Set upload_to to put images in static folder - DONE
-		
-		Redo report_results
-		SymbolSet no longer has Length, substitute with length of image_set
-	Register Symbol Set/Single Sets in admin page
-		ModelAdmin, requires sorting out
+		Fix URL - DONE (kludgy)
+		Redo report_results - DONE
+	Fix response_set display - Ask Ashley
 
 SUPERUSER = ashley
 SUPERUSER PASS = ashleythesis
-
-Next steps:
-	Add ready alert to beginning of trial - Done
-	After ajax call, display completion message, button that links to subject/myself - Done
-	Populate seed.json with remainder of trials
-	Find larger images
-____________________
-
-Login with IDs - Done
-	Only IDs stored on site - Done
-	Default to next available, pull last().id + 1 - Done
-Trial display data
-	Responses per minute using existing response times - Done
-	Aggregate correct responses - Done
-	Passing criteria
-User phase view - DONE
-	Trials completed per phase - DONE
-	Criterion per phase - DONE
-	Total duration - DONE
-Store session duration, new model foreignkey subject? - Done
-Trial page
-	Directions physically printed
-	Just ready button on page, probably alert()
-	Add boolean flag to model, first trial for user always loads Phase 0, doesn't collect data
-Post-trial feedback
-	Figure something out
-Admin view:
-	Set aside ID for Ashley
-	Displays list of subjects, links, etc
-	Disables trial button

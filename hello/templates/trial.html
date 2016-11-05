@@ -41,8 +41,16 @@
 
     function processResponse(response){
       timer_end = Date.now();
-      responses[index] = {response_id:trial[index]["response_id"], given_response:response, response_time:timer_end-timer_start};
-      if (trial[index].training && trial[index].correct_response == response){
+      var response_option;
+      if (response.id == trial[index]["option_1"]){
+        response_option = 1;
+      } else if (response.id == trial[index]["option_2"]){
+        response_option = 2;
+      } else {
+        response_option = 3;
+      }
+      responses[index] = {response_id:trial[index]["response_id"], given_response:response_option, response_time:timer_end-timer_start};
+      if (trial[index].training && response_option == trial[index].correct_response){
         alert("That was the correct answer!\nYou answered in " + ((timer_end-timer_start)/1000.0).toFixed(2) + " seconds.");
       } else if (trial[index].training){
         alert("Sorry, that answer was incorrect.");
@@ -74,9 +82,9 @@
 
     function refresh(){
       $("#stimulus").append($('<img>',{src:trial[index]["stimulus"]}));
-      //$("#left_option").append($('<img>',{src:"{% static 'hello/' %}" + trial[index]["symbol_set"] + "_" + trial[index]["left"] + ".jpg"}));
-      //$("#center_option").append($('<img>',{src:"{% static 'hello/' %}" + trial[index]["symbol_set"] + "_" + trial[index]["center"] + ".jpg"}));
-      //$("#right_option").append($('<img>',{src:"{% static 'hello/' %}" + trial[index]["symbol_set"] + "_" + trial[index]["right"] + ".jpg"}));
+      $("#left_option").append($('<img>',{src:trial[index]["left"]["image"]}));
+      $("#center_option").append($('<img>',{src:trial[index]["center"]["image"]}));
+      $("#right_option").append($('<img>',{src:trial[index]["right"]["image"]}));
       if (trial[index]["modifier"]){
         $("#modifier").html("!!!!!");
       } else {

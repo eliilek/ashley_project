@@ -42,9 +42,6 @@ class Symbol(models.Model):
     def __unicode__(self):
         return self.name
 
-    def get_path(self):
-        return self.url[6:]
-
 class SingleSet(models.Model):
     class Meta:
         verbose_name = "Single Set"

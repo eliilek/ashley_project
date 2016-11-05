@@ -93,18 +93,18 @@ def trial(request):
             temp_dict = model_to_dict(current_set)
             temp_dict["symbol_set"] = current_set.symbol_set.name
             temp_dict["left"] = model_to_dict(options_list[0])
-            temp_dict["left"]["image"] = temp_dict["left"]["image"].url
+            temp_dict["left"]["image"] = temp_dict["left"]["image"].url[6:]
             temp_dict["center"] = model_to_dict(options_list[1])
-            temp_dict["center"]["image"] = temp_dict["center"]["image"].url
+            temp_dict["center"]["image"] = temp_dict["center"]["image"].url[6:]
             temp_dict["right"] = model_to_dict(options_list[2])
-            temp_dict["right"]["image"] = temp_dict["right"]["image"].url
+            temp_dict["right"]["image"] = temp_dict["right"]["image"].url[6:]
             trial.append(temp_dict)
     random.shuffle(trial)
     new_block = ResponseBlock(subject=subject, phase=subject.phase, symbol_set=symbol_set, complete=False)
     new_block.save()
     for i in range(len(trial)):
         stimulus = Symbol.objects.get(pk=trial[i]["stimulus"])
-        trial[i]["stimulus"] = Symbol.objects.get(pk=trial[i]["stimulus"]).image.url
+        trial[i]["stimulus"] = Symbol.objects.get(pk=trial[i]["stimulus"]).image.url[6:]
         option_1 = Symbol.objects.get(pk=trial[i]["option_1"])
         option_2 = Symbol.objects.get(pk=trial[i]["option_2"])
         option_3 = Symbol.objects.get(pk=trial[i]["option_3"])
