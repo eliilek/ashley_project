@@ -80,21 +80,30 @@
       refresh();
     }
 
+    var delay = false;
+
     function refresh(){
       $("#stimulus").append($('<img>',{src:trial[index]["stimulus"]}));
-      $("#left_option").append($('<img>',{src:trial[index]["left"]["image"]}));
-      $("#center_option").append($('<img>',{src:trial[index]["center"]["image"]}));
-      $("#right_option").append($('<img>',{src:trial[index]["right"]["image"]}));
       if (trial[index]["modifier"]){
         $("#modifier").html("!!!!!");
       } else {
         $("#modifier").html("?????");
       }
-      $("#left_option").click(function(){processResponse(trial[index]["left"])});
-      $("#center_option").click(function(){processResponse(trial[index]["center"])});
-      $("#right_option").click(function(){processResponse(trial[index]["right"])});
-
-      timer_start = Date.now();
+      $("#background").on('click', function(evt){
+        if (delay){
+          delay = false;
+          $("#background").off('click');
+          $("#left_option").append($('<img>',{src:trial[index]["left"]["image"]}));
+          $("#center_option").append($('<img>',{src:trial[index]["center"]["image"]}));
+          $("#right_option").append($('<img>',{src:trial[index]["right"]["image"]}));
+          $("#left_option").click(function(){processResponse(trial[index]["left"])});
+          $("#center_option").click(function(){processResponse(trial[index]["center"])});
+          $("#right_option").click(function(){processResponse(trial[index]["right"])});
+          timer_start = Date.now();
+        } else {
+          delay = true;
+        }
+      });
     }
 
     $(document).ready(function(){
