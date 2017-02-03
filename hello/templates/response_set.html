@@ -5,17 +5,22 @@
     <script type="text/javascript">
     $(document).ready(function(){
       var response_times_ms = 0;
+      var correct_response_times_ms = 0;
       var count = 0;
       var total_correct = 0;
 
       {% for response in responses %}
       response_times_ms += Number({{ response.get_response_time }});
       count += 1;
-      total_correct += Number({{ response.correct }});
+      {% if response.correct %}
+        total_correct += 1
+        correct_response_times_ms += Number({{response.get_response_time}});
+      {% endif %}
       {% endfor %}
 
       response_times_ms /= 60000.0;
       $("#rpm").html((count/response_times_ms).toFixed(2));
+      $("#crpm").html((total_correct/correct_response_times_ms).toFixed(2));
       $("#total_correct").html(total_correct);
       $("#passed").html("{{ response_block.successful }}");
     });
@@ -50,13 +55,15 @@
         {% endfor %}
         <tr>
           <th colspan=2>Responses Per Minute</th>
+          <th>Correct Responses Per Minute</th>
           <th colspan=2>Total Correct Responses</th>
-          <th colspan=2>Passing Criteria</th>
+          <th>Passing Criteria</th>
         </tr>
         <tr>
           <td id="rpm" colspan=2 style="text-align:center"></td>
+          <td id="crpm" style="text-align:center"></td>
           <td id="total_correct" colspan=2 style="text-align:center"></td>
-          <td id="passed" colspan=2 style="text-align:center"></td>
+          <td id="passed" style="text-align:center"></td>
         </tr>
       </table>
     {% endif %}

@@ -7,7 +7,7 @@
 #stimulus {
   position: absolute;
   height: 15%;
-  top: 15%;
+  top: 25%;
   left: 50%;
   margin: 0 0 0 -25px;
 }
@@ -15,7 +15,7 @@
 #modifier {
   position: absolute;
   height: 5%;
-  top: 20%;
+  top: 15%;
   left: 50%;
   margin: 0 0 0 -22px;
 }
