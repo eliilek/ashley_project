@@ -1,6 +1,10 @@
 from django.db import models
 from django.urls import reverse
 from django.utils import timezone
+import cloudinary
+import cloudinary.uploader
+import cloudinary.api
+from cloudinary.models import CloudinaryField
 
 class Phase(models.Model):
     phase_num = models.SmallIntegerField(verbose_name="Phase Number")
@@ -37,7 +41,7 @@ class SymbolSet(models.Model):
 class Symbol(models.Model):
     name = models.CharField(max_length=50)
     symbol_set = models.ForeignKey(SymbolSet, on_delete=models.CASCADE)
-    image = models.ImageField(upload_to="hello/static/hello/symbols")
+    image = CloudinaryField('image')
 
     def __unicode__(self):
         return self.name

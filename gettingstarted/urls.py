@@ -18,5 +18,5 @@ urlpatterns = [
     url(r'^myself', hello.views.myself, name='myself'),
     url(r'^report_results', hello.views.report_results, name='report_results'),
     url(r'^phase/(?P<subid>[0-9]+)/$', hello.views.phase_view, name='phase_view'),
-    url(r'^admin', include(admin.site.urls), name='admin'),
+    url(r'^admin/', include(admin.site.urls), name='admin'),
 ]

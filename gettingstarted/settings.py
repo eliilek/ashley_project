@@ -135,3 +135,5 @@ STATICFILES_DIRS = (
 # Simplified static file serving.
 # https://warehouse.python.org/project/whitenoise/
 STATICFILES_STORAGE = 'whitenoise.django.GzipManifestStaticFilesStorage'
+
+CLOUDINARY_URL="cloudinary://415497451575186:lfxj80HZUdx8FiclOsW-l8KsF80@hxjugbgyj"
