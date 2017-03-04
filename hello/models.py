@@ -80,18 +80,21 @@ class ResponseBlock(models.Model):
         return reverse("response_set", args=[str(self.id)])
 
     def successful(self):
-        responses = self.response_set.all()
-        time = 0
-        correct = 0
-        count = 0
-        for response in responses:
-            time += response.get_response_time()
-            count += 1
-            correct += response.correct()
-        if (not self.phase.passing_accuracy_percentage) or (correct/count >= self.phase.passing_accuracy_percentage/100):
-            if (not self.phase.passing_time) or (time <= self.phase.passing_time):
-                return "Passed"
-        return "Failed"
+        try:
+            responses = self.response_set.all()
+            time = 0
+            correct = 0
+            count = 0
+            for response in responses:
+                time += response.get_response_time()
+                count += 1
+                correct += response.correct()
+            if (not self.phase.passing_accuracy_percentage) or (correct/count >= self.phase.passing_accuracy_percentage/100):
+                if (not self.phase.passing_time) or (time <= self.phase.passing_time):
+                    return "Passed"
+            return "Failed"
+        except:
+            return "Failed"
 
 class Response(models.Model):
     block = models.ForeignKey(ResponseBlock, on_delete=models.CASCADE)
