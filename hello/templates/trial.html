@@ -55,7 +55,7 @@
       if (trial[index].training && response_option == trial[index].correct_response){
         swal("Correct", "You answered in " + ((timer_end-timer_start)/1000.0).toFixed(2) + " seconds.", "success");
       } else if (trial[index].training){
-        swal("Incorrect", type="error");
+        swal("Incorrect");
       }
 
       $("#stimulus img").last().remove()
