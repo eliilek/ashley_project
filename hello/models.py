@@ -109,7 +109,7 @@ class Response(models.Model):
 
     def get_response_time(self):
         try:
-            return self.response_time.microseconds/100000.0
+            return self.response_time.milliseconds/1000.0
         except:
             return 0
 
