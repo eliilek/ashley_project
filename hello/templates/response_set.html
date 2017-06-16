@@ -13,14 +13,13 @@
       response_times_ms += Number({{ response.get_response_time }});
       count += 1;
       {% if response.correct %}
-        total_correct += 1
+        total_correct += 1;
         correct_response_times_ms += Number({{response.get_response_time}});
       {% endif %}
       {% endfor %}
 
-      response_times_ms /= 60000.0;
-      $("#rpm").html((count/response_times_ms).toFixed(2));
-      $("#crpm").html((total_correct/correct_response_times_ms).toFixed(2));
+      $("#rpm").html(((60/(response_times_ms / 1000))*count).toFixed(2));
+      $("#crpm").html(((60/(correct_response_times_ms / 1000))*total_correct).toFixed(2));
       $("#total_correct").html(total_correct);
       $("#passed").html("{{ response_block.successful }}");
     });
