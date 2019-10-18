@@ -39,7 +39,7 @@ django-extensions==1.7.1
 docopt==0.6.2
 docutils==0.11
 docutils-aafigure==0.3
-ecdsa==0.11
+ecdsa==0.13.3
 ed25519ll==0.6
 egenix-mx-base==3.2.7
 enable==4.4.1
