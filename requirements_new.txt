@@ -106,7 +106,7 @@ pipreqs==0.4.3
 ply==3.4
 Polygon==2.0.5
 pp==1.6.4
-psutil==2.1.1
+psutil==5.6.6
 psycopg2==2.6.2
 py==1.4.20
 py2exe==0.6.9
