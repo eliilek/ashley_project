@@ -101,7 +101,7 @@ pathlib==1.0
 patsy==0.2.1
 pdfrw==0.1
 pep8==1.5.7
-Pillow==2.4.0
+Pillow==8.1.1
 pipreqs==0.4.3
 ply==3.4
 Polygon==2.0.5
