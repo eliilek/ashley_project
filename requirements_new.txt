@@ -74,7 +74,7 @@ ipdb==0.8
 ipdbplugin==1.4
 ipython==2.1.0
 jdcal==1.0
-Jinja2==2.7.2
+Jinja2==2.11.3
 keyring==3.8
 kiwisolver==0.1.2
 logilab-common==0.61.0
