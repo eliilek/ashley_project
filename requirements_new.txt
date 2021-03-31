@@ -78,7 +78,7 @@ Jinja2==2.7.2
 keyring==3.8
 kiwisolver==0.1.2
 logilab-common==0.61.0
-lxml==3.3.5
+lxml==4.6.3
 mahotas==1.1.0
 Mako==0.9.1
 MarkupSafe==0.23
