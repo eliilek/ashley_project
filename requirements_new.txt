@@ -108,7 +108,7 @@ Polygon==2.0.5
 pp==1.6.4
 psutil==2.1.1
 psycopg2==2.6.2
-py==1.4.20
+py==1.10.0
 py2exe==0.6.9
 pyamg==2.1.0
 PyAudio==0.2.8
