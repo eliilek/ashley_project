@@ -152,7 +152,7 @@ pytz==2014.3
 PyVISA==1.4
 PyWavelets==0.2.2
 pywin==0.3.1
-pywin32==219
+pywin32==301
 pywinauto==0.4.2
 PyYAML==3.11
 pyzmq==14.3.0
