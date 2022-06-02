@@ -68,7 +68,7 @@ guidata==1.6.1
 guiqwt==2.3.2
 gunicorn==19.4.5
 h5py==2.3.0
-html5lib==0.999
+html5lib==0.99999999
 imageio==0.4.1
 ipdb==0.8
 ipdbplugin==1.4
