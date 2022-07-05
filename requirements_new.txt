@@ -112,7 +112,7 @@ py==1.4.20
 py2exe==0.6.9
 pyamg==2.1.0
 PyAudio==0.2.8
-pycares==0.6.1
+pycares==4.2.0
 pycparser==2.10
 pycrypto==2.6.1
 pycurl==7.19.3.1
