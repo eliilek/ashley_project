@@ -195,7 +195,7 @@ virtualenv==14.0.6
 virtualenvwrapper-win==1.1.5
 ViTables==2.1
 VPython==5.74
-VTK==5.10.1
+VTK==9.0.1
 whitenoise==3.2.1
 Whoosh==2.5.7
 wincertstore==0.2
