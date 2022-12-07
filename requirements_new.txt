@@ -14,7 +14,7 @@ blosc==1.2.3
 Bottleneck==0.8.0
 cchardet==0.3.5
 cdecimal==2.3
-certifi==14.5.14
+certifi==2022.12.7
 cffi==0.8.2
 chaco==4.4.1
 charade==1.0.3
